@@ -41,6 +41,8 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         setErrors([])
         setStatus(null)
 
+        console.log('the user is trying to login', props)
+
         axios
             .post('/login', props)
             .then(() => mutate())
