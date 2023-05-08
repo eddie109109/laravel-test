@@ -6,19 +6,20 @@ import { useRouter } from 'next/router'
 export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     const router = useRouter()
 
-    const { data: user, error, mutate } = useSWR('/api/user', () =>
-        axios
-            .get('/api/user')
-            .then(res => res.data)
-            .catch(error => {
-                console.log('failed to get the user', error)
-                if (error.response.status !== 409) throw error
+    const { data: user, error, mutate } = useSWR('/api/user', async () => {
+        try {
+            const res = await axios.get('/api/user')
+            console.log('can login with ----', res)
+            return res.data
+        } catch (error) {
+            console.log('failed to get the user', error)
+            if (error.response.status !== 409) throw error
 
-                router.push('/verify-email')
-            }),
-    )
+            router.push('/verify-email')
+        }
+    })
 
-    const csrf = () => axios.get('/sanctum/csrf-cookie')
+    // const csrf = () => axios.get('/sanctum/csrf-cookie')
 
     const register = async ({ setErrors, ...props }) => {
         // await csrf()
@@ -27,8 +28,12 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
         axios
             .post('/api/register', props)
-            .then(() => mutate())
+            .then(() => {
+                console.log('can register----')
+            })
+            // .then(() => mutate())
             .catch(error => {
+                console.log('failed to  register----', error)
                 if (error.response.status !== 422) throw error
 
                 setErrors(error.response.data.errors)
@@ -70,7 +75,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     }
 
     const resetPassword = async ({ setErrors, setStatus, ...props }) => {
-        await csrf()
+        // await csrf()
 
         setErrors([])
         setStatus(null)

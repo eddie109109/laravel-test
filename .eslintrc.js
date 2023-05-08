@@ -1,6 +1,6 @@
 module.exports = {
     root: true,
-    parser: 'babel/eslint-parser',
+    parser: 'babel/eslint-parser', // changed from @babel/eslint-parser to this
     env: {
         node: true,
         browser: true,
